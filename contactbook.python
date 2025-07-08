@@ -1,0 +1,96 @@
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+
+contacts = []
+
+def add_contact():
+    name = name_entry.get()
+    phone = phone_entry.get()
+    email = email_entry.get()
+    address = address_entry.get()
+    
+    if name and phone:
+        contact = {"name": name, "phone": phone, "email": email, "address": address}
+        contacts.append(contact)
+        update_contact_list()
+        clear_fields()
+        messagebox.showinfo("Success", "Contact added successfully!")
+    else:
+        messagebox.showwarning("Input Error", "Name and Phone are required.")
+
+def update_contact_list():
+    contact_listbox.delete(0, tk.END)
+    for contact in contacts:
+        contact_listbox.insert(tk.END, f"{contact['name']} - {contact['phone']}")
+
+def search_contact():
+    keyword = simpledialog.askstring("Search", "Enter name or phone to search:")
+    if keyword:
+        for contact in contacts:
+            if keyword.lower() in contact['name'].lower() or keyword in contact['phone']:
+                messagebox.showinfo("Contact Found",
+                                    f"Name: {contact['name']}\nPhone: {contact['phone']}\nEmail: {contact['email']}\nAddress: {contact['address']}")
+                return
+        messagebox.showinfo("Not Found", "Contact not found.")
+
+def delete_contact():
+    selected = contact_listbox.curselection()
+    if selected:
+        index = selected[0]
+        contacts.pop(index)
+        update_contact_list()
+        messagebox.showinfo("Deleted", "Contact deleted successfully.")
+    else:
+        messagebox.showwarning("Select Contact", "Please select a contact to delete.")
+
+def update_contact():
+    selected = contact_listbox.curselection()
+    if selected:
+        index = selected[0]
+        contact = contacts[index]
+
+        name = simpledialog.askstring("Update", "New Name:", initialvalue=contact["name"]) or contact["name"]
+        phone = simpledialog.askstring("Update", "New Phone:", initialvalue=contact["phone"]) or contact["phone"]
+        email = simpledialog.askstring("Update", "New Email:", initialvalue=contact["email"]) or contact["email"]
+        address = simpledialog.askstring("Update", "New Address:", initialvalue=contact["address"]) or contact["address"]
+
+        contacts[index] = {"name": name, "phone": phone, "email": email, "address": address}
+        update_contact_list()
+        messagebox.showinfo("Updated", "Contact updated successfully.")
+    else:
+        messagebox.showwarning("Select Contact", "Please select a contact to update.")
+
+def clear_fields():
+    name_entry.delete(0, tk.END)
+    phone_entry.delete(0, tk.END)
+    email_entry.delete(0, tk.END)
+    address_entry.delete(0, tk.END)
+
+root = tk.Tk()
+root.title("Contact Manager")
+
+tk.Label(root, text="Name:").grid(row=0, column=0, sticky="w")
+name_entry = tk.Entry(root, width=30)
+name_entry.grid(row=0, column=1)
+
+tk.Label(root, text="Phone:").grid(row=1, column=0, sticky="w")
+phone_entry = tk.Entry(root, width=30)
+phone_entry.grid(row=1, column=1)
+
+tk.Label(root, text="Email:").grid(row=2, column=0, sticky="w")
+email_entry = tk.Entry(root, width=30)
+email_entry.grid(row=2, column=1)
+
+tk.Label(root, text="Address:").grid(row=3, column=0, sticky="w")
+address_entry = tk.Entry(root, width=30)
+address_entry.grid(row=3, column=1)
+
+tk.Button(root, text="Add Contact", width=20, command=add_contact).grid(row=4, column=0, pady=5)
+tk.Button(root, text="Search Contact", width=20, command=search_contact).grid(row=4, column=1)
+tk.Button(root, text="Update Contact", width=20, command=update_contact).grid(row=5, column=0)
+tk.Button(root, text="Delete Contact", width=20, command=delete_contact).grid(row=5, column=1)
+
+contact_listbox = tk.Listbox(root, width=50)
+contact_listbox.grid(row=6, column=0, columnspan=2, pady=10)
+
+root.mainloop()
